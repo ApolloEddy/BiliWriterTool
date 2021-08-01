@@ -44,9 +44,9 @@ namespace BiliWriterTool.DataContainer
 	public partial class imagesImageItem
 	{
 
-		private imagesImageItemArtwork artworkField;
+		private imagesImageItemArtwork artworkField = new imagesImageItemArtwork();
 
-		private imagesImageItemAuthor authorField;
+		private imagesImageItemAuthor authorField = new imagesImageItemAuthor();
 
 		private string localpathField;
 
@@ -101,6 +101,8 @@ namespace BiliWriterTool.DataContainer
 
 		private long idField;
 
+		private string urlField;
+
 		/// <remarks/>
 		public string name
 		{
@@ -124,6 +126,19 @@ namespace BiliWriterTool.DataContainer
 			set
 			{
 				this.idField = value;
+			}
+		}
+
+		/// <remarks/>
+		public string url
+		{
+			get
+			{
+				return this.urlField;
+			}
+			set
+			{
+				this.urlField = value;
 			}
 		}
 	}
@@ -165,6 +180,8 @@ namespace BiliWriterTool.DataContainer
 			}
 		}
 	}
+
+
 
 
 

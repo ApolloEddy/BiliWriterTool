@@ -20,6 +20,7 @@ namespace Aries
 			this.url = url;
 			ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls;
 			request = (HttpWebRequest)WebRequest.Create(url);
+			request.CookieContainer = new CookieContainer();
 			computerUAsign = computerUA;
 			Timeout = 1000;
 		}
@@ -109,6 +110,8 @@ namespace Aries
 			}
 			set
 			{
+				if (request.CookieContainer is null)
+				{ request.CookieContainer = new CookieContainer(); }
 				request.CookieContainer = value;
 			}
 		}
@@ -248,6 +251,12 @@ namespace Aries
 			requestStream.Write(bytes, 0, bytes.Length);
 			requestStream.Close();
 		}
+		[Obsolete("未完成！")]
+		public void setCookies(string cookiesString, string path)
+		{
+			foreach (var item in cookiesString.Split(';'))
+			{ var splited = item.Split('='); Cookies.Add(new Cookie(splited[0], splited[1], path)); }
+		}
 
 		/// <summary>
 		/// 获取请求返回的响应流
@@ -276,7 +285,7 @@ namespace Aries
 		/// 返回 1970年1月1日 到现在的协调世界时(UTC)毫秒数的差值
 		/// </summary>
 		/// <returns>间隔毫秒数<see cref="long"/></returns>
-		public long getTime()
+		public static long getTime()
 		{
 			var origin = DateTime.Parse("1970/01/01").ToUniversalTime().AddHours(8.0);
 			long diff = DateTime.Now.ToUniversalTime().Ticks - origin.Ticks;
