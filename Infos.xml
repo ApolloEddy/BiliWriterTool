@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<images>
+	<imageItem>
+		<artwork>
+			<name>string</name>
+			<id>114514114514</id>
+		</artwork>
+		<author>
+			<name>string</name>
+			<id>114514114514</id>
+		</author>
+		<localpath>string</localpath>
+	</imageItem>
+	<imageItem>
+		<artwork>
+			<name>string</name>
+			<id>114514114514</id>
+		</artwork>
+		<author>
+			<name>string</name>
+			<id>114514114514</id>
+		</author>
+		<localpath>string</localpath>
+	</imageItem>	
+</images>
