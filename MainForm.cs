@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using Aries;
+using System;
 using System.IO;
+using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
-using Aries;
+using System.Collections.Generic;
 using BiliWriterTool.DataContainer;
 
 namespace BiliWriterTool
@@ -97,35 +97,41 @@ namespace BiliWriterTool
 					{
 						BackgroundThread = new Thread(() =>
 						{
-						string idExpr = textBox_search.Text.ToLower();
-						long id = 0;
-						try { id = long.Parse(idExpr.Replace("p", "")); }
-						catch (Exception ex) { SetError(ex.ToString()); return; }
-
-						if (idExpr.StartsWith("p")) // 作品\图片
-						{
-							var imgs = PixivImageLoader.createImagesInfoByArtworkID(id);
-							// MessageBox.Show($"Pcount:{imgs.imageItem.Count}\n" + Interactor.Serialize(imgs));
-							foreach (var item in imgs.imageItem)
+							ChangeLabelText delegetTrd = new ChangeLabelText(() => { lb_garhering.Visible = true; });
+							lb_garhering.Invoke(delegetTrd);
+							string idExpr = textBox_search.Text.ToLower();
+							long id = 0;
+							try { id = long.Parse(idExpr.Replace("p", "")); }
+							catch (Exception ex) { SetError(ex.ToString()); return; }
+	
+							if (idExpr.StartsWith("p")) // 作品\图片
 							{
-									var info = ImageInfo.FromImagesImageItem(item);
-									if (!Images.Contains(info))
-									{ Images.Add(info); }
-									else { info.Dispose(); }
-								if ((imgs.imageItem.IndexOf(item) == 1) || (Images.Count <= 1))
-								{ ShowImage(true); }
+								var imgs = PixivImageLoader.createImagesInfoByArtworkID(id);
+								// MessageBox.Show($"Pcount:{imgs.imageItem.Count}\n" + Interactor.Serialize(imgs));
+								foreach (var item in imgs.imageItem)
+								{
+										var info = ImageInfo.FromImagesImageItem(item);
+										if (!Images.Contains(info))
+										{ Images.Add(info); }
+										else { info.Dispose(); }
+									if ((imgs.imageItem.IndexOf(item) == 1) || (Images.Count <= 1))
+									{ ShowImage(true); }
+									UpdateInfo update = UpdateInfos;
+									UpdateInfos(Images[imgIndex]);
+								}
 							}
-						}
-						else if (idExpr.StartsWith("a")) // 作者
-						{
-								
-						}
-						BackgroundThread.DisableComObjectEagerCleanup();
-						BackgroundThread.Abort();
-					});
-					BackgroundThread.Start();
-					break;
-				}
+							else if (idExpr.StartsWith("a")) // 作者
+							{
+
+							}
+							delegetTrd = new ChangeLabelText(() => { lb_garhering.Visible = false; });
+							lb_garhering.Invoke(delegetTrd);
+							BackgroundThread.DisableComObjectEagerCleanup();
+							BackgroundThread.Abort();
+						});
+						BackgroundThread.Start();
+						break;
+					}
 			}
 		}
 		private void button_before_Click(object sender, EventArgs e)

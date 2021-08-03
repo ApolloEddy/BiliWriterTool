@@ -30,10 +30,13 @@ namespace BiliWriterTool
 		private void InitializeComponent()
 		{
 			this.groupBox_ImgClass = new System.Windows.Forms.GroupBox();
+			this.lb_garhering = new System.Windows.Forms.Label();
 			this.pictureBox_preview = new System.Windows.Forms.PictureBox();
 			this.groupBox_ImgInfo = new System.Windows.Forms.GroupBox();
 			this.lb_authorValue = new System.Windows.Forms.Label();
 			this.lb_author = new System.Windows.Forms.Label();
+			this.ib_imgIndexValue = new System.Windows.Forms.Label();
+			this.lb_imgIndex = new System.Windows.Forms.Label();
 			this.lb_imgSizeValue = new System.Windows.Forms.Label();
 			this.lb_imgSize = new System.Windows.Forms.Label();
 			this.lb_imgHeightValue = new System.Windows.Forms.Label();
@@ -58,8 +61,6 @@ namespace BiliWriterTool
 			this.lb_path = new System.Windows.Forms.Label();
 			this.lb_preview = new System.Windows.Forms.Label();
 			this.lb_source = new System.Windows.Forms.Label();
-			this.lb_imgIndex = new System.Windows.Forms.Label();
-			this.ib_imgIndexValue = new System.Windows.Forms.Label();
 			this.groupBox_ImgClass.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox_preview)).BeginInit();
 			this.groupBox_ImgInfo.SuspendLayout();
@@ -68,6 +69,7 @@ namespace BiliWriterTool
 			// groupBox_ImgClass
 			// 
 			this.groupBox_ImgClass.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
+			this.groupBox_ImgClass.Controls.Add(this.lb_garhering);
 			this.groupBox_ImgClass.Controls.Add(this.pictureBox_preview);
 			this.groupBox_ImgClass.Controls.Add(this.groupBox_ImgInfo);
 			this.groupBox_ImgClass.Controls.Add(this.button_after);
@@ -90,6 +92,18 @@ namespace BiliWriterTool
 			this.groupBox_ImgClass.TabIndex = 0;
 			this.groupBox_ImgClass.TabStop = false;
 			this.groupBox_ImgClass.Text = "图片类";
+			// 
+			// lb_garhering
+			// 
+			this.lb_garhering.BackColor = System.Drawing.Color.Transparent;
+			this.lb_garhering.Font = new System.Drawing.Font("STFangsong", 13F);
+			this.lb_garhering.Location = new System.Drawing.Point(83, 220);
+			this.lb_garhering.Name = "lb_garhering";
+			this.lb_garhering.Size = new System.Drawing.Size(127, 20);
+			this.lb_garhering.TabIndex = 81;
+			this.lb_garhering.Text = "正在获取中...";
+			this.lb_garhering.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			this.lb_garhering.Visible = false;
 			// 
 			// pictureBox_preview
 			// 
@@ -149,6 +163,28 @@ namespace BiliWriterTool
 			this.lb_author.Size = new System.Drawing.Size(55, 13);
 			this.lb_author.TabIndex = 0;
 			this.lb_author.Text = "作者名：";
+			// 
+			// ib_imgIndexValue
+			// 
+			this.ib_imgIndexValue.AutoSize = true;
+			this.ib_imgIndexValue.Font = new System.Drawing.Font("STFangsong", 9F);
+			this.ib_imgIndexValue.ForeColor = System.Drawing.SystemColors.ControlDark;
+			this.ib_imgIndexValue.Location = new System.Drawing.Point(69, 135);
+			this.ib_imgIndexValue.Name = "ib_imgIndexValue";
+			this.ib_imgIndexValue.Size = new System.Drawing.Size(38, 13);
+			this.ib_imgIndexValue.TabIndex = 1;
+			this.ib_imgIndexValue.Text = "NULL";
+			// 
+			// lb_imgIndex
+			// 
+			this.lb_imgIndex.AutoSize = true;
+			this.lb_imgIndex.Font = new System.Drawing.Font("STFangsong", 9F);
+			this.lb_imgIndex.ForeColor = System.Drawing.SystemColors.ControlDark;
+			this.lb_imgIndex.Location = new System.Drawing.Point(7, 135);
+			this.lb_imgIndex.Name = "lb_imgIndex";
+			this.lb_imgIndex.Size = new System.Drawing.Size(67, 13);
+			this.lb_imgIndex.TabIndex = 0;
+			this.lb_imgIndex.Text = "图像索引：";
 			// 
 			// lb_imgSizeValue
 			// 
@@ -361,7 +397,7 @@ namespace BiliWriterTool
 			this.textBox_search.Location = new System.Drawing.Point(61, 52);
 			this.textBox_search.Name = "textBox_search";
 			this.textBox_search.Size = new System.Drawing.Size(238, 25);
-			this.textBox_search.TabIndex = 20;
+			this.textBox_search.TabIndex = 0;
 			// 
 			// lb_search
 			// 
@@ -377,8 +413,9 @@ namespace BiliWriterTool
 			// 
 			this.comboBox_source.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
 			this.comboBox_source.Font = new System.Drawing.Font("STFangsong", 10F);
-			this.comboBox_source.ForeColor = System.Drawing.SystemColors.ControlLight;
+			this.comboBox_source.ForeColor = System.Drawing.SystemColors.ControlLightLight;
 			this.comboBox_source.FormattingEnabled = true;
+			this.comboBox_source.IntegralHeight = false;
 			this.comboBox_source.Items.AddRange(new object[] {
             "P站 - Pixiv (https://www.pixiv.net)"});
 			this.comboBox_source.Location = new System.Drawing.Point(61, 20);
@@ -416,28 +453,6 @@ namespace BiliWriterTool
 			this.lb_source.Size = new System.Drawing.Size(49, 16);
 			this.lb_source.TabIndex = 0;
 			this.lb_source.Text = "图源：";
-			// 
-			// lb_imgIndex
-			// 
-			this.lb_imgIndex.AutoSize = true;
-			this.lb_imgIndex.Font = new System.Drawing.Font("STFangsong", 9F);
-			this.lb_imgIndex.ForeColor = System.Drawing.SystemColors.ControlDark;
-			this.lb_imgIndex.Location = new System.Drawing.Point(7, 135);
-			this.lb_imgIndex.Name = "lb_imgIndex";
-			this.lb_imgIndex.Size = new System.Drawing.Size(67, 13);
-			this.lb_imgIndex.TabIndex = 0;
-			this.lb_imgIndex.Text = "图像索引：";
-			// 
-			// ib_imgIndexValue
-			// 
-			this.ib_imgIndexValue.AutoSize = true;
-			this.ib_imgIndexValue.Font = new System.Drawing.Font("STFangsong", 9F);
-			this.ib_imgIndexValue.ForeColor = System.Drawing.SystemColors.ControlDark;
-			this.ib_imgIndexValue.Location = new System.Drawing.Point(69, 135);
-			this.ib_imgIndexValue.Name = "ib_imgIndexValue";
-			this.ib_imgIndexValue.Size = new System.Drawing.Size(38, 13);
-			this.ib_imgIndexValue.TabIndex = 1;
-			this.ib_imgIndexValue.Text = "NULL";
 			// 
 			// MainForm
 			// 
@@ -480,7 +495,6 @@ namespace BiliWriterTool
 		private System.Windows.Forms.Button button_search;
 		private System.Windows.Forms.TextBox textBox_search;
 		private System.Windows.Forms.Label lb_search;
-		private System.Windows.Forms.ComboBox comboBox_source;
 		private System.Windows.Forms.Label lb_source;
 		private System.Windows.Forms.Label lb_imgSizeValue;
 		private System.Windows.Forms.Label lb_imgSize;
@@ -498,6 +512,8 @@ namespace BiliWriterTool
 		private System.Windows.Forms.Label lb_path;
 		private System.Windows.Forms.Label ib_imgIndexValue;
 		private System.Windows.Forms.Label lb_imgIndex;
+		private System.Windows.Forms.Label lb_garhering;
+		private System.Windows.Forms.ComboBox comboBox_source;
 	}
 }
 
