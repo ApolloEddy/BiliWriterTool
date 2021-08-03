@@ -17,19 +17,80 @@ namespace BiliWriterTool
 		}
 
 		private Thread BackgroundThread;
-		public List<ImageInfo> images = new List<ImageInfo>();
+		public List<ImageInfo> Images = new List<ImageInfo>();
+		public int imgIndex = 0;
 
 
 		private void SetError(string message)
 		{ MessageBox.Show(message, "出错啦 >_< !!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+		private void SetInfomation(string message)
+		{ MessageBox.Show(message, "温馨提示 ₍ ᐢ.⌄.ᐢ ₎ ꜆˖.♡", MessageBoxButtons.OK, MessageBoxIcon.Information); }
+		private void ShowImage(bool next = true, Button sender = null)
+		{
+			UpdateInfo update = UpdateInfos;
+			if (sender is null)
+			{ imgIndex = 0; pictureBox_preview.BackgroundImage = Images[imgIndex].Image; UpdateInfos(Images[imgIndex]); return; }
+			if (Images.Count == 0)
+			{ SetError("没有任何图片欸！"); return; }
+			if (Images.Count == 1) 
+			{ imgIndex = 0; pictureBox_preview.BackgroundImage = Images[imgIndex].Image; UpdateInfos(Images[imgIndex]); return; }
+			if ((imgIndex  == 0) && (!next))
+			{ SetInfomation("已经是第一张图片了噢!"); return; }
+			if ((imgIndex + 1 >= Images.Count) && (next))
+			{ SetInfomation("已经是最后一张图片了噢!"); return; }
+			if (next) { imgIndex++; } else { imgIndex--; };
+			pictureBox_preview .BackgroundImage = Images[imgIndex].Image;
+			UpdateInfos(Images[imgIndex]);
+		}
+		private string getFilename(ImageInfo info)
+		{
+			string url = info.Url;
+			return url.Substring(url.LastIndexOf('/') + 1);
+		}
+		private void UpdateInfos(ImageInfo info)
+		{
+			lb_artworkValue.Invoke(new ChangeLabelText(()   => { lb_artworkValue.Text = info.Artwork; }));
+			lb_artworkIDValue.Invoke(new ChangeLabelText(() => { lb_artworkIDValue.Text = info.ArtworkID.ToString(); }));
+			lb_authorValue.Invoke(new ChangeLabelText(()    => { lb_authorValue.Text = info.Author; }));
+			lb_authorIDValue.Invoke(new ChangeLabelText(()  => { lb_authorIDValue.Text = info.AuthorID.ToString(); }));
+			lb_imgWidthValue.Invoke(new ChangeLabelText(()  => { lb_imgWidthValue.Text = info.Width.ToString(); }));
+			lb_imgHeightValue.Invoke(new ChangeLabelText(() => { lb_imgHeightValue.Text = info.Height.ToString(); }));
+			lb_imgSizeValue.Invoke(new ChangeLabelText(()   => { lb_imgSizeValue.Text = info.Size.ToString(); }));
+			ib_imgIndexValue.Invoke(new ChangeLabelText(()  => { ib_imgIndexValue.Text = $"{imgIndex + 1} / {Images.Count}"; }));
+		}
+		private delegate void UpdateInfo(ImageInfo info);
+		private delegate void ChangeLabelText();
 
 		private void MainForm_Load(object sender, EventArgs e)
 		{
+			groupBox_ImgClass.ForeColor = Color.FromKnownColor(KnownColor.ControlLightLight);
+			groupBox_ImgInfo.ForeColor = Color.FromKnownColor(KnownColor.ControlLightLight);
+		}
+		private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			// 保存数据
+			images imgsDataRoot = new images();
+			imgsDataRoot.imageItem = new List<imagesImageItem>();
+			foreach (var item in Images)
+			{ imgsDataRoot.imageItem.Add(item.ToImagesImageItem()); }
+			string fname = textBox_path.Text;
+			if (!fname.EndsWith("/")) { fname += "/"; }
+			fname += "data.xml";
+			File.WriteAllText(fname, Interactor.Serialize(imgsDataRoot));
 
+			// 关闭线程
+			if (BackgroundThread == null)
+			{ return; }
+			if (!BackgroundThread.IsAlive)
+			{ return; }
+			BackgroundThread.Abort();
+			BackgroundThread.DisableComObjectEagerCleanup();
+			BackgroundThread = null;
 		}
 		private void button_search_Click(object sender, EventArgs e)
 		{
-			
+			if (textBox_search.Text == "")
+			{ SetError("没有输入搜索内容噢！"); return; }
 			switch (comboBox_source.Text)
 			{
 				case "P站 - Pixiv (https://www.pixiv.net)":
@@ -39,7 +100,7 @@ namespace BiliWriterTool
 						string idExpr = textBox_search.Text.ToLower();
 						long id = 0;
 						try { id = long.Parse(idExpr.Replace("p", "")); }
-						catch (Exception ex) { SetError(ex.ToString()); }
+						catch (Exception ex) { SetError(ex.ToString()); return; }
 
 						if (idExpr.StartsWith("p")) // 作品\图片
 						{
@@ -48,11 +109,11 @@ namespace BiliWriterTool
 							foreach (var item in imgs.imageItem)
 							{
 									var info = ImageInfo.FromImagesImageItem(item);
-									if (!images.Contains(info))
-									{ images.Add(info); }
+									if (!Images.Contains(info))
+									{ Images.Add(info); }
 									else { info.Dispose(); }
-								if ((imgs.imageItem.IndexOf(item) == 1) && (images.Count > 1))
-								{ pictureBox_preview.BackgroundImage = images[images.Count - 1].Image; }
+								if ((imgs.imageItem.IndexOf(item) == 1) || (Images.Count <= 1))
+								{ ShowImage(true); }
 							}
 						}
 						else if (idExpr.StartsWith("a")) // 作者
@@ -66,6 +127,29 @@ namespace BiliWriterTool
 					break;
 				}
 			}
+		}
+		private void button_before_Click(object sender, EventArgs e)
+		{ ShowImage(false, (Button)sender); }
+		private void button_after_Click(object sender, EventArgs e)
+		{ ShowImage(true,  (Button)sender); }
+		private void button_saveOne_Click(object sender, EventArgs e)
+		{
+			string fname = textBox_path.Text;
+			if (!fname.EndsWith("/")) { fname += "/"; }
+			fname += getFilename(Images[imgIndex]); 
+			Images[imgIndex].Image.Save(fname);
+			SetInfomation($"成功保存图片到文件 \"{fname}\"!  (゜-゜)つロ~");
+		}
+		private void button_saveAll_Click(object sender, EventArgs e)
+		{
+			string fname = textBox_path.Text;
+			if (!fname.EndsWith("/")) { fname += "/"; }
+			foreach (var item in Images)
+			{
+				string fullpath = fname + getFilename(item);
+				item.Image.Save(fullpath);
+			}
+			SetInfomation($"成功保存图片到路径 \"{fname}\"! 共保存{Images.Count}张图片！  (゜-゜)つロ~");
 		}
 	}
 
@@ -84,17 +168,18 @@ namespace BiliWriterTool
 			get
 			{
 				string result = string.Empty;
-				long total = Width * Height;
+				long total = imgSize;
 				double kb = (double)total / 1024;
 				double mb = kb / 1024;
-				if( mb > 1)
-				{ result = string.Format("{0:2}", mb) + " KB"; }
+				if( mb < 1)
+				{ result = string.Format("{0:0.00}", kb) + " KB"; }
 				else
-				{ result = string.Format("{0:2}", kb) + " MB"; }
+				{ result = string.Format("{0:0.00}", mb) + " MB"; }
 
 				return result;
 			}
 		}
+		private long imgSize { get; set; }
 		public static ImageInfo FromImagesImageItem(imagesImageItem item)
 		{
 			ImageInfo result = new ImageInfo();
@@ -102,7 +187,11 @@ namespace BiliWriterTool
 			result.ArtworkID = item.artwork.id;
 			result.Author = item.author.name;
 			result.AuthorID = item.author.id;
-			result.Image = PixivImageLoader.getImage(item.artwork.url);
+			result.Url = item.artwork.url;
+			var bytes = PixivImageLoader.getImageBytes(item.artwork.url);
+			result.imgSize = (long)bytes.Length;
+			result.Image = Image.FromStream(new MemoryStream(bytes));
+			bytes = null;
 			return result;
 		}
 		public imagesImageItem ToImagesImageItem()
@@ -216,7 +305,7 @@ namespace BiliWriterTool
 				image.author.name = authorInfo[0];
 				image.author.id = long.Parse(authorInfo[1]);
 				image.artwork.name = artworkInfo[0];
-				image.artwork.id = long.Parse(authorInfo[1]);
+				image.artwork.id = long.Parse(artworkInfo[1]);
 				image.artwork.url = urls[i].Replace("\\/", "/");
 				result.imageItem.Add(image);
 			}
